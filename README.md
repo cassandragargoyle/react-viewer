@@ -5,23 +5,29 @@ addresses, importance badge, attachment chips, and a tabbed body
 (**HTML / Plain text / Source / Headers**) — inside whatever container hosts it.
 
 The component is **format-agnostic**: it never touches MIME. Parsing is the job
-of the mail readers in `src/shared/readers/mail` (`parseEml` today, a `.msg`
-reader later), so the viewer works unchanged for any format that can produce a
-`ParsedEmail`. Introduced in issue 075.
+of the mail readers in `src/shared/readers/mail` — `parseEml` for `.eml` and
+`parseMsg` for Outlook `.msg` — so the viewer works unchanged for any format that
+can produce a `ParsedEmail`. Introduced in issue 075; `.msg` was added in issue
+119 **without a single behavioural change here**, which is the split working as
+designed.
 
 ![EmailViewer visual reference](./EmailViewer.svg)
 
 ## What it is good for
 
-- **Previewing `.eml` files** in the Pilot file preview (`PreviewHost`) and in
-  the VS Code custom editor for `.eml` (`EmlEditorProvider`)
+- **Previewing `.eml` and `.msg` files** in the Pilot file preview
+  (`PreviewHost`) and in the VS Code custom editor (`MailEditorProvider`, view
+  types `portunix.eml` and `portunix.msg`)
 - **Showing an archived message** anywhere in the app — evidence attached to a
   venture, a mail dropped into a workspace, a message stored with a discussion
 - **Inspecting a message safely** — the HTML body is sanitized and rendered in a
   fully sandboxed iframe with a restrictive CSP, so tracking pixels, remote CSS
   and scripts never load. Attachments are download-only and never executed.
 - **Debugging mail plumbing** — the Source and Headers tabs expose the raw MIME
-  and the full header list without leaving the app
+  and the full header list without leaving the app. A `.msg` has no MIME source,
+  so Source shows its transport headers verbatim when it has them, and otherwise
+  a block reconstructed from its MAPI properties, marked as such on its first
+  line (issue 119, ADR-4)
 
 It is **not** a mail client: there is no mailbox, no threading, no composing.
 The toolbar renders Reply / Reply all / Forward as **disabled placeholders** —
@@ -51,7 +57,8 @@ caller only has to give it a sized box.
 `ParsedEmail` (see `src/shared/readers/mail/model.ts`) carries `subject`,
 `from` / `to` / `cc`, `date`, `importance`, optional `html` and `text` bodies,
 `attachments` (raw `Uint8Array` bytes), the full `headers` list, the original
-`raw` MIME source, and a `format` discriminator (`'eml' | 'msg'`).
+`raw` source, and a `format` discriminator (`'eml' | 'msg'`). The viewer never
+branches on `format`; it exists so a caller can tell where a message came from.
 
 ## Structure
 
@@ -122,16 +129,20 @@ mail HTML assumes a white canvas.
 
 ## Integration
 
-- `PreviewHost.tsx` — `MailPreview` reads the file text through the host bridge,
-  calls `parseEml`, and renders the viewer for the `mail` preview kind. The OS format
-  comes from the bridge's optional `systemDateFormat()`, which the Electron host
-  answers from `shared/node/osDateFormat` in main
+- `PreviewHost.tsx` — `MailPreview` renders the viewer for the `mail` preview kind
+  and picks the reader by extension: `.eml` comes through the bridge's `readText`,
+  `.msg` through its `readBytes`. The OS format comes from the bridge's optional
+  `systemDateFormat()`, which the Electron host answers from
+  `shared/node/osDateFormat` in main
 - `entries/index.eml.vscode.tsx` — webview entry for the VS Code custom editor;
-  posts `ready`, receives `setEml`, parses, and renders, with `Loading…` and
-  parse-failure states. `setEml` also carries the OS date format, resolved in the
-  extension host by `shared/node/osDateFormat` (the registry on Windows, POSIX
+  posts `ready`, receives `setMail`, parses, and renders, with `Loading…` and
+  failure states. `setMail` carries `.eml` as `text` and `.msg` as `base64` (the
+  transport that survives the webview message boundary unchanged), an `error` when
+  the host could not deliver the file at all, and the OS date format resolved in
+  the extension host by `shared/node/osDateFormat` (the registry on Windows, POSIX
   `LC_*` / `LANG` elsewhere)
-- `src/pilot/ui/index.ts` — public export (`EmailViewer`, `EmailViewerProps`)
+- `src/pilot/ui/index.ts` — public export (`EmailViewer`, `EmailViewerProps`),
+  alongside the readers (`parseEml`, `parseMsg`) an external host needs
 
 ## Files
 
@@ -149,4 +160,4 @@ mail HTML assumes a white canvas.
 ---
 
 **Created**: 2026-08-16
-**Last Updated**: 2026-09-06
+**Last Updated**: 2026-09-07
