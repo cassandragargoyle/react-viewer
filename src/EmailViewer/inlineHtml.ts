@@ -7,7 +7,7 @@
 // images to data: URIs, sanitizes with DOMPurify, and blocks remote content via CSP (issue 075)
 
 import DOMPurify from 'dompurify';
-import type { MailAttachment } from '../../../../shared/readers/mail';
+import type { EmailAttachment } from './types';
 
 // Tags never useful in a mail body and risky to keep: scripts, framing, plugins, forms, and
 // resource-loading head elements (remote CSS/base). DOMPurify strips scripts/handlers anyway;
@@ -32,7 +32,7 @@ function bytesToBase64(bytes: Uint8Array): string {
  * data: images and inline styles, so remote content (tracking pixels, external CSS) is
  * blocked by default.
  */
-export function buildInlineHtml(rawHtml: string, attachments: MailAttachment[]): string {
+export function buildInlineHtml(rawHtml: string, attachments: EmailAttachment[]): string {
     const cidMap = new Map<string, string>();
     for (const att of attachments) {
         if (att.disposition === 'inline' && att.contentId) {

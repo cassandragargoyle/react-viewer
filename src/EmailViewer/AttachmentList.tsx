@@ -7,7 +7,7 @@
 // Attachment bytes are never executed — download only, no auto-open (issue 075 security)
 
 import React from 'react';
-import type { MailAttachment } from '../../../../shared/readers/mail';
+import type { EmailAttachment } from './types';
 import { AttachmentIcon, DownloadIcon } from './icons';
 
 // Human-readable byte size (B / KB / MB) for the chip label
@@ -18,7 +18,7 @@ function formatSize(bytes: number): string {
 }
 
 // Save an attachment's raw bytes via a transient object URL, revoked right after the click
-function downloadAttachment(att: MailAttachment): void {
+function downloadAttachment(att: EmailAttachment): void {
     const url = URL.createObjectURL(new Blob([att.bytes as BlobPart], { type: att.mimeType }));
     const a = document.createElement('a');
     a.href = url;
@@ -29,7 +29,7 @@ function downloadAttachment(att: MailAttachment): void {
     URL.revokeObjectURL(url);
 }
 
-export function AttachmentList({ attachments }: { attachments: MailAttachment[] }): JSX.Element | null {
+export function AttachmentList({ attachments }: { attachments: EmailAttachment[] }): JSX.Element | null {
     if (attachments.length === 0) return null;
     return (
         <div className="email-attachments" aria-label="Attachments">

@@ -1,0 +1,87 @@
+# Publish the @cassandragargoyle/react-viewer package to npmjs.com
+# Triggered by a v* tag or manual dispatch; the pattern follows portunix-vscode ADR-011/012
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and pack without publishing'
+        type: boolean
+        default: false
+
+# npm Trusted Publishing: the job proves who it is with a GitHub OIDC token (id-token: write)
+# and npm exchanges it for a short-lived publish credential. No npm token is stored in the
+# repository secrets, and npm attaches provenance to every version it publishes this way.
+# The trusted publisher (this repository, publish.yml) is configured on npmjs.com, in the
+# package's settings
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      # Trusted Publishing needs npm 11.5.1 or newer
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Read package version
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # Tag payload must match package.json (a vX.Y.Z tag that does not match the
+      # cut version is a mistake — fail loudly instead of publishing).
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$TAG_VERSION" != "${{ steps.pkg.outputs.version }}" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version ${{ steps.pkg.outputs.version }}"
+            exit 1
+          fi
+
+      # Skip publish if this version already exists on the registry so a re-run
+      # (or a workflow_dispatch on an unchanged version) does not hard-fail.
+      # npmjs.com answers anonymous reads, so this needs no credential
+      - name: Check if version already published
+        id: published
+        run: |
+          if npm view "@cassandragargoyle/react-viewer@${{ steps.pkg.outputs.version }}" version >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Version ${{ steps.pkg.outputs.version }} already published — skipping."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish (dry run)
+        if: steps.published.outputs.exists == 'false' && inputs.dry_run
+        run: npm publish --dry-run
+
+      - name: Publish
+        if: steps.published.outputs.exists == 'false' && !inputs.dry_run
+        run: npm publish

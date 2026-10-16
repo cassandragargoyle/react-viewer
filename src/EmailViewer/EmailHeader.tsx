@@ -4,12 +4,10 @@
  */
 
 // EmailViewer header block: subject plus From / To / Cc / Date rows
-// Renders the normalized ParsedEmail fields; omits empty recipient rows
+// Renders the normalized EmailMessage fields; omits empty recipient rows
 
 import React from 'react';
-import type { EmailAddress, ParsedEmail } from '../../../../shared/readers/mail';
-import { formatDateTime } from '../../../../shared/format';
-import type { OsDateTimeFormat } from '../../../../shared/format';
+import { formatEmailDate, type EmailAddress, type EmailDateFormatter, type EmailMessage } from './types';
 import { PriorityHighIcon, PriorityLowIcon } from './icons';
 
 // Render an address as "Name <addr>" or just the address when unnamed
@@ -22,7 +20,7 @@ function formatAddresses(list: EmailAddress[]): string {
 }
 
 // Badge shown next to the subject for non-normal importance; normal renders nothing
-function ImportanceBadge({ importance }: { importance: ParsedEmail['importance'] }): JSX.Element | null {
+function ImportanceBadge({ importance }: { importance: EmailMessage['importance'] }): JSX.Element | null {
     if (importance === 'high') {
         return (
             <span className="email-importance email-importance-high" title="High importance">
@@ -52,8 +50,8 @@ function AddressRow({ label, value }: { label: string; value: string }): JSX.Ele
     );
 }
 
-export function EmailHeader({ email, dateFormat }: { email: ParsedEmail; dateFormat?: OsDateTimeFormat }): JSX.Element {
-    const date = email.date ? formatDateTime(email.date, dateFormat) : '';
+export function EmailHeader({ email, formatDate = formatEmailDate }: { email: EmailMessage; formatDate?: EmailDateFormatter }): JSX.Element {
+    const date = email.date ? formatDate(email.date) : '';
     return (
         <div className="email-header">
             <div className="email-header-subject-row">

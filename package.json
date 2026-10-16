@@ -1,0 +1,67 @@
+{
+  "name": "@cassandragargoyle/react-viewer",
+  "version": "0.1.0",
+  "description": "React viewers for document formats, shared across the CassandraGargoyle ecosystem",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "react",
+    "viewer",
+    "email",
+    "typescript",
+    "vscode-webview",
+    "cassandragargoyle"
+  ],
+  "homepage": "https://github.com/cassandragargoyle/react-viewer#readme",
+  "bugs": {
+    "url": "https://github.com/cassandragargoyle/react-viewer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cassandragargoyle/react-viewer.git"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "dompurify": "^3.2.7",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.1.4",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "dompurify": "^3.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

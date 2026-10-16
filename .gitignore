@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+
+# Local environment
+.env
+.env.*
+
+# Editor and OS noise
+.DS_Store
+*.log
+
+# The active assistant role, chosen per developer with /role
+CLAUDE.local.md
+
+# The walk-through video of the BlockDocument sample is local only, see its media/README.md
+src/BlockDocument/samples/media/*.mp4

@@ -1,0 +1,13 @@
+{
+  // Disable line length check (long lines allowed across the repo)
+  "MD013": false,
+  // Allow hard tabs inside code blocks (Java/Go code style uses tabs)
+  "MD010": {
+    "code_blocks": false
+  },
+  // Frontmatter `title` is required and must match the H1 (see
+  // docs/contributing/MARKDOWN-FRONTMATTER.md), so it is not a second top-level heading
+  "MD025": {
+    "front_matter_title": ""
+  }
+}

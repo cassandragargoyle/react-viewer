@@ -4,8 +4,8 @@
 
 - **GitHub Repository**: <https://github.com/CassandraGargoyle/react-viewer>
 - **Project Name**: react-viewer
-- **Primary Purpose**: Purpose to be defined
-- **Primary Language**: To be determined
+- **Primary Purpose**: React viewers for document formats (e-mail first), published as `@cassandragargoyle/react-viewer` and shared across the CassandraGargoyle ecosystem
+- **Primary Language**: TypeScript, React 19, Node.js 24+
 - **Platforms**: Linux, Windows (macOS development status TBD)
 
 ## Security Guidelines

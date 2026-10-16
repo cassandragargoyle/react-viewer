@@ -1,23 +1,23 @@
 # EmailViewer
 
-Read-only **e-mail viewer**. Renders a normalized `ParsedEmail` — subject,
+Read-only **e-mail viewer**. Renders a normalized `EmailMessage` — subject,
 addresses, importance badge, attachment chips, and a tabbed body
 (**HTML / Plain text / Source / Headers**) — inside whatever container hosts it.
 
 The component is **format-agnostic**: it never touches MIME. Parsing is the job
-of the mail readers in `src/shared/readers/mail` — `parseEml` for `.eml` and
-`parseMsg` for Outlook `.msg` — so the viewer works unchanged for any format that
-can produce a `ParsedEmail`. Introduced in issue 075; `.msg` was added in issue
-119 **without a single behavioural change here**, which is the split working as
-designed.
+of a reader — in `portunix-vscode` that is `parseEml` for `.eml` and `parseMsg` for
+Outlook `.msg` in `src/shared/readers/mail` — so the viewer works unchanged for any
+format that can produce an `EmailMessage`. Introduced in `portunix-vscode` issue
+075; `.msg` was added in issue 119 **without a single behavioural change here**,
+which is the split working as designed. It moved to this library in issue
+[132](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/132-shared-modules-and-group-b-components.md).
 
 ![EmailViewer visual reference](./EmailViewer.svg)
 
 ## What it is good for
 
-- **Previewing `.eml` and `.msg` files** in the Pilot file preview
-  (`PreviewHost`) and in the VS Code custom editor (`MailEditorProvider`, view
-  types `portunix.eml` and `portunix.msg`)
+- **Previewing `.eml` and `.msg` files** — in `portunix-vscode` both the Pilot
+  file preview and the VS Code custom editor use it
 - **Showing an archived message** anywhere in the app — evidence attached to a
   venture, a mail dropped into a workspace, a message stored with a discussion
 - **Inspecting a message safely** — the HTML body is sanitized and rendered in a
@@ -36,13 +36,16 @@ composing was explicitly out of scope for issue 075.
 ## Usage
 
 ```tsx
-import { EmailViewer } from '@cassandragargoyle/pilot-ui';
-import { parseEml } from '../../shared/readers/mail';
+import { EmailViewer } from '@cassandragargoyle/react-viewer';
 
-const email = await parseEml(rawEmlText);
-
+// email: an EmailMessage produced by any reader
 <EmailViewer email={email} />;
+
+// The host decides how dates look, e.g. the operating system's own pattern
+<EmailViewer email={email} formatDate={(date) => formatForThisMachine(date)} />;
 ```
+
+`dompurify` is a peer dependency: the HTML body is always sanitized.
 
 The viewer fills its host container (`height: 100%`, column flex layout), so the
 caller only has to give it a sized box.
@@ -51,14 +54,14 @@ caller only has to give it a sized box.
 
 | Prop | Type | Description |
 | ----- | ----- | ----- |
-| `email` | `ParsedEmail` | Normalized message produced by a reader; the only input |
-| `dateFormat` | `OsDateTimeFormat?` | How the **operating system** renders dates, resolved by the host: `locale`, plus `shortDate` / `timeFormat` on Windows. Omit when it is unknown — the date then uses the fallback pattern below |
+| `email` | `EmailMessage` | Normalized message produced by a reader; the only data input |
+| `formatDate` | `(date: Date) => string`? | Text of the Date row. Omit it and the row uses `formatEmailDate`, the fixed pattern below |
 
-`ParsedEmail` (see `src/shared/readers/mail/model.ts`) carries `subject`,
+`EmailMessage` (see [`types.ts`](./types.ts)) carries `subject`,
 `from` / `to` / `cc`, `date`, `importance`, optional `html` and `text` bodies,
-`attachments` (raw `Uint8Array` bytes), the full `headers` list, the original
-`raw` source, and a `format` discriminator (`'eml' | 'msg'`). The viewer never
-branches on `format`; it exists so a caller can tell where a message came from.
+`attachments` (raw `Uint8Array` bytes), the full `headers` list and the original
+`raw` source. A reader may add fields of its own, such as the source format; the
+viewer ignores them.
 
 ## Structure
 
@@ -71,20 +74,14 @@ branches on `format`; it exists so a caller can tell where a message came from.
 
 ## Behavior
 
-- **Date follows the OS, not the UI language** — the `Date` row is formatted with
-  `formatDateTime` (`src/shared/format`) from the `dateFormat` prop, most faithful
-  source first:
-  1. the **operating system's own pattern**, when the host reports one. On Windows
-     that is `sShortDate` / `sTimeFormat`, so the row reads `01.07.2026 11:00:00`
-     exactly like every other application there — the locale's CLDR form would give
-     `01. 07. 2026`, which is Czech but not what the machine shows;
-  2. the **locale's CLDR form**, when only a BCP 47 tag is known (Linux, macOS);
-  3. the **fixed pattern** `2026-09-02 19:44:05` (`YYYY-MM-DD HH:MM:SS`, local time,
-     zero-padded, no comma) when nothing is known.
-
-  Seconds appear in every path, which a bare `toLocaleString()` drops. The component
-  never reads the format from its environment: inside a webview or an Electron window
-  that yields the application UI language, which is the wrong answer (issue 115).
+- **The host decides how the date looks** — the `Date` row is the text the
+  `formatDate` prop returns. Without it the row uses the **fixed pattern**
+  `2026-09-02 19:44:05` (`YYYY-MM-DD HH:MM:SS`, local time, zero-padded, no comma),
+  which is unambiguous in every region and keeps the seconds a bare
+  `toLocaleString()` drops. The component never reads a format from its
+  environment: inside a webview or an Electron window that yields the application
+  UI language, not the operating system setting (`portunix-vscode` issue 115).
+  Pilot passes a formatter that follows the operating system's own pattern.
 - **Empty rows are omitted** — an address row renders only when it has a value,
   so a message without `Cc` shows no `Cc` line.
 - **Importance badge** — `high` and `low` render a labelled chevron badge next
@@ -121,14 +118,16 @@ independent layers (`inlineHtml.ts` + `EmailBody.tsx`):
 ## Styling
 
 `EmailViewer.css` holds every rule under the `.email-*` prefix and follows the
-[GUI Design Principles](../../../../../docs/architecture/GUI-DESIGN-PRINCIPLES.md):
+[GUI Design Principles](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/architecture/GUI-DESIGN-PRINCIPLES.md):
 VS Code theme variables with literal fallbacks, monochrome 16px stroke icons
 (`icons.tsx`, `fill: none`, `currentColor`), and a 4px spacing grid. The body
 document rendered inside the iframe uses its own light-on-white typography, since
 mail HTML assumes a white canvas.
 
-## Integration
+## Integration in portunix-vscode
 
+- `PilotEmailViewer.tsx` — the Pilot wrapper that turns the host's OS date format
+  into `formatDate`; `pilot-ui` exports it as `EmailViewer`
 - `PreviewHost.tsx` — `MailPreview` renders the viewer for the `mail` preview kind
   and picks the reader by extension: `.eml` comes through the bridge's `readText`,
   `.msg` through its `readBytes`. The OS format comes from the bridge's optional
@@ -141,7 +140,7 @@ mail HTML assumes a white canvas.
   the host could not deliver the file at all, and the OS date format resolved in
   the extension host by `shared/node/osDateFormat` (the registry on Windows, POSIX
   `LC_*` / `LANG` elsewhere)
-- `src/pilot/ui/index.ts` — public export (`EmailViewer`, `EmailViewerProps`),
+- `src/pilot/ui/index.ts` — `pilot-ui` export (`EmailViewer`, `EmailViewerProps`),
   alongside the readers (`parseEml`, `parseMsg`) an external host needs
 
 ## Files
@@ -152,12 +151,14 @@ mail HTML assumes a white canvas.
 - `AttachmentList.tsx` — attachment chips and download handling
 - `EmailBody.tsx` — tabbed body, sandboxed HTML frame
 - `inlineHtml.ts` — `cid:` resolution, DOMPurify sanitizing, CSP wrapper
+- `types.ts` — `EmailMessage` and its parts, `formatEmailDate`
 - `icons.tsx` — monochrome 16px stroke icons
 - `EmailViewer.css` — all `.email-*` styles
 - `EmailViewer.svg` — visual reference (this README's image)
-- `index.ts` — public exports (`EmailViewer`, `EmailViewerProps`)
+- `index.ts` — public exports (`EmailViewer`, its props and types, `formatEmailDate`)
+- `EmailViewer.test.tsx` — header rows, date formatting, badge, attachments, tabs
 
 ---
 
 **Created**: 2026-08-16
-**Last Updated**: 2026-09-07
+**Last Updated**: 2026-10-17

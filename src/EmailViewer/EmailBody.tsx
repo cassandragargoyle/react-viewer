@@ -7,19 +7,19 @@
 // Only the tabs backed by content are shown; the HTML tab is preferred when present
 
 import React, { useEffect, useMemo, useState } from 'react';
-import type { ParsedEmail } from '../../../../shared/readers/mail';
+import type { EmailMessage } from './types';
 import { buildInlineHtml } from './inlineHtml';
 
 type BodyTab = 'html' | 'text' | 'source' | 'headers';
 
 // Renders the sanitized HTML body in a fully sandboxed iframe (no scripts, no same-origin).
 // Inline images are embedded as data: URIs, so nothing outside the srcDoc is loaded.
-function HtmlBody({ email }: { email: ParsedEmail }): JSX.Element {
+function HtmlBody({ email }: { email: EmailMessage }): JSX.Element {
     const srcDoc = useMemo(() => buildInlineHtml(email.html ?? '', email.attachments), [email]);
     return <iframe className="email-html-frame" title="Message body" sandbox="" srcDoc={srcDoc} />;
 }
 
-export function EmailBody({ email }: { email: ParsedEmail }): JSX.Element {
+export function EmailBody({ email }: { email: EmailMessage }): JSX.Element {
     // Available tabs, in display order — HTML first when the message has an HTML part
     const tabs = useMemo<BodyTab[]>(() => {
         const list: BodyTab[] = [];
