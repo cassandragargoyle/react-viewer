@@ -10,7 +10,7 @@ Outlook `.msg` in `src/shared/readers/mail` — so the viewer works unchanged fo
 format that can produce an `EmailMessage`. Introduced in `portunix-vscode` issue
 075; `.msg` was added in issue 119 **without a single behavioural change here**,
 which is the split working as designed. It moved to this library in issue
-[132](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/132-shared-modules-and-group-b-components.md).
+[132](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/done/132-shared-modules-and-group-b-components.md).
 
 ![EmailViewer visual reference](./EmailViewer.svg)
 

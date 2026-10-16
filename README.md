@@ -17,7 +17,7 @@ file, maps it to the viewer's own type, and passes it in as props. General UI bu
 blocks live next door in [`react-components`](https://github.com/cassandragargoyle/react-components).
 
 Viewers came from `portunix-vscode`; the placement is decided in its
-[issue 132](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/132-shared-modules-and-group-b-components.md)
+[issue 132](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/done/132-shared-modules-and-group-b-components.md)
 and [ADR-012](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/adr/012-react-components-shared-submodule.md).
 
 ## Getting Started
