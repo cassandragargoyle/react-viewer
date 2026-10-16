@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 600" width="820" height="600">
+  <defs>
+    <style>
+      .bg { fill: #1e1e1e; }
+      .panel-bg { fill: #1e1e1e; }
+      .panel-border { stroke: #444444; fill: none; stroke-width: 1; }
+      .sep { stroke: #444444; stroke-width: 1; }
+      .text { fill: #cccccc; font-family: 'Segoe UI', sans-serif; }
+      .text-dim { fill: #858585; font-family: 'Segoe UI', sans-serif; }
+      .text-white { fill: #ffffff; font-family: 'Segoe UI', sans-serif; }
+      .subject { fill: #ffffff; font-family: 'Segoe UI', sans-serif; font-weight: 600; }
+      .mono { fill: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; }
+      .accent { fill: #75beff; }
+      .btn-stroke { stroke: #444444; fill: none; stroke-width: 1; }
+      .chip-bg { fill: #252526; stroke: #3c3c3c; stroke-width: 1; }
+      .frame-bg { fill: #ffffff; }
+      .frame-h { fill: #111111; font-family: 'Segoe UI', sans-serif; font-weight: 600; }
+      .frame-t { fill: #333333; font-family: 'Segoe UI', sans-serif; }
+      .icon { stroke: #cccccc; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+      .icon-dim { stroke: #858585; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+      .annotation { fill: #75beff; font-family: 'Segoe UI', sans-serif; }
+      .ann-line { stroke: #75beff; stroke-width: 1; stroke-dasharray: 3,3; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="820" height="600"/>
+
+  <!-- ================= EMLVIEWER PANEL ================= -->
+  <g transform="translate(30, 36)">
+    <rect x="3" y="3" width="460" height="520" rx="6" fill="rgba(0,0,0,0.35)"/>
+    <rect class="panel-bg" x="0" y="0" width="460" height="520" rx="6"/>
+    <rect class="panel-border" x="0" y="0" width="460" height="520" rx="6"/>
+
+    <!-- Toolbar (.email-toolbar) — Reply / Reply all / Forward (disabled: composing is future) -->
+    <rect class="btn-stroke" x="12" y="8" width="78" height="24" rx="4"/>
+    <g transform="translate(20, 12)" opacity="0.3">
+      <path class="icon-dim" d="M6 4 2 8l4 4"/>
+      <path class="icon-dim" d="M2 8h6a5 5 0 0 1 5 5"/>
+    </g>
+    <text class="text-dim" font-size="12" x="40" y="24" opacity="0.5">Reply</text>
+
+    <rect class="btn-stroke" x="96" y="8" width="96" height="24" rx="4"/>
+    <g transform="translate(104, 12)" opacity="0.3">
+      <path class="icon-dim" d="M5 4 1 8l4 4"/>
+      <path class="icon-dim" d="M9 4 5 8l4 4"/>
+      <path class="icon-dim" d="M5 8h4a5 5 0 0 1 5 5"/>
+    </g>
+    <text class="text-dim" font-size="12" x="124" y="24" opacity="0.5">Reply all</text>
+
+    <rect class="btn-stroke" x="198" y="8" width="92" height="24" rx="4"/>
+    <g transform="translate(206, 12)" opacity="0.3">
+      <path class="icon-dim" d="M10 4l4 4-4 4"/>
+      <path class="icon-dim" d="M14 8H8a5 5 0 0 0-5 5"/>
+    </g>
+    <text class="text-dim" font-size="12" x="226" y="24" opacity="0.5">Forward</text>
+
+    <line x1="0" y1="40" x2="460" y2="40" class="sep"/>
+
+    <!-- Header block (.email-header) -->
+    <text class="subject" font-size="16" x="16" y="66">Q3 dashboard preview</text>
+    <!-- Importance badge (.email-importance-high) — high priority -->
+    <rect x="196" y="52" width="96" height="18" rx="4" fill="none" stroke="#febc2e" stroke-opacity="0.5"/>
+    <g transform="translate(202, 54)">
+      <path d="M4 9l4-4 4 4" fill="none" stroke="#febc2e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 12l4-4 4 4" fill="none" stroke="#febc2e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text font-size="11" font-weight="600" fill="#febc2e" x="220" y="65">High priority</text>
+    <text class="text-dim" font-size="12" x="16" y="88">From</text>
+    <text class="text" font-size="12" x="64" y="88">Design Team &lt;design@example.com&gt;</text>
+    <text class="text-dim" font-size="12" x="16" y="106">To</text>
+    <text class="text" font-size="12" x="64" y="106">Bob &lt;bob@example.com&gt;</text>
+    <text class="text-dim" font-size="12" x="16" y="124">Cc</text>
+    <text class="text" font-size="12" x="64" y="124">Carol &lt;carol@example.com&gt;</text>
+    <text class="text-dim" font-size="12" x="16" y="142">Date</text>
+    <text class="text" font-size="12" x="64" y="142">1 Jul 2026, 10:30</text>
+
+    <line x1="0" y1="156" x2="460" y2="156" class="sep"/>
+
+    <!-- Attachment chip (.email-attachment-chip) — download only, never auto-opened -->
+    <rect class="chip-bg" x="16" y="166" width="170" height="26" rx="4"/>
+    <g transform="translate(24, 171)">
+      <path class="icon-dim" d="M12.5 6.5 7 12a3 3 0 0 1-4-4l5.5-5.5a2 2 0 0 1 3 3L6 11"/>
+    </g>
+    <text class="text" font-size="12" x="44" y="183">report.pdf</text>
+    <text class="text-dim" font-size="12" x="118" y="183">18 KB</text>
+    <g transform="translate(162, 171)">
+      <path class="icon-dim" d="M8 2v8"/>
+      <path class="icon-dim" d="M4.5 7 8 10.5 11.5 7"/>
+      <path class="icon-dim" d="M3 13h10"/>
+    </g>
+
+    <line x1="0" y1="204" x2="460" y2="204" class="sep"/>
+
+    <!-- Body tabs (.email-body-tabs) — HTML active -->
+    <text class="text-white" font-size="12" x="24" y="224">HTML</text>
+    <rect class="accent" x="20" y="230" width="40" height="2"/>
+    <text class="text-dim" font-size="12" x="76" y="224">Plain text</text>
+    <text class="text-dim" font-size="12" x="150" y="224">Source</text>
+    <text class="text-dim" font-size="12" x="210" y="224">Headers</text>
+
+    <line x1="0" y1="232" x2="460" y2="232" class="sep"/>
+
+    <!-- Body content: sanitized HTML in a sandboxed iframe (its own white document) -->
+    <rect class="frame-bg" x="8" y="240" width="444" height="256" rx="4"/>
+    <text class="frame-h" font-size="15" x="24" y="270">Q3 dashboard</text>
+    <text class="frame-t" font-size="12" x="24" y="292">Here is the latest chart, embedded inline</text>
+    <text class="frame-t" font-size="12" x="24" y="308">via a cid: reference:</text>
+    <!-- inline cid: image resolved to a blob: URL -->
+    <rect x="24" y="320" width="96" height="96" rx="4" fill="#3478f6"/>
+    <text class="frame-t" font-size="12" x="24" y="440">The image above is embedded from an inline</text>
+    <text class="frame-t" font-size="12" x="24" y="456">attachment as a data: URI by the viewer.</text>
+  </g>
+
+  <!-- ================= ANNOTATIONS ================= -->
+
+  <!-- Toolbar -->
+  <text class="annotation" font-size="10" x="512" y="52">.email-toolbar</text>
+  <text class="annotation" font-size="9"  x="512" y="64">Reply / Reply-all / Forward — disabled (composing is future)</text>
+  <line x1="494" y1="56" x2="510" y2="56" class="ann-line"/>
+
+  <!-- Header -->
+  <text class="annotation" font-size="10" x="512" y="132">.email-header</text>
+  <text class="annotation" font-size="9"  x="512" y="144">subject + From / To / Cc / Date from ParsedEmail</text>
+  <line x1="494" y1="130" x2="510" y2="130" class="ann-line"/>
+
+  <!-- Attachments -->
+  <text class="annotation" font-size="10" x="512" y="208">.email-attachment-chip</text>
+  <text class="annotation" font-size="9"  x="512" y="220">download only — attachment bytes are never executed</text>
+  <line x1="494" y1="215" x2="510" y2="215" class="ann-line"/>
+
+  <!-- Tabs -->
+  <text class="annotation" font-size="10" x="512" y="256">.email-body-tabs</text>
+  <text class="annotation" font-size="9"  x="512" y="268">HTML / Plain text / Source (raw MIME) / Headers</text>
+  <line x1="494" y1="262" x2="510" y2="262" class="ann-line"/>
+
+  <!-- iframe -->
+  <text class="annotation" font-size="10" x="512" y="360">&lt;iframe srcDoc sandbox&gt;</text>
+  <text class="annotation" font-size="9"  x="512" y="372">DOMPurify + CSP: no scripts, remote content blocked;</text>
+  <text class="annotation" font-size="9"  x="512" y="384">isolated document so mail CSS cannot bleed into the app</text>
+  <line x1="494" y1="366" x2="510" y2="366" class="ann-line"/>
+
+  <!-- inline image -->
+  <text class="annotation" font-size="10" x="512" y="430">cid: → data:</text>
+  <text class="annotation" font-size="9"  x="512" y="442">inline images embedded as data: URIs (a sandboxed</text>
+  <text class="annotation" font-size="9"  x="512" y="454">iframe's opaque origin can't load parent blob: URLs)</text>
+  <line x1="494" y1="436" x2="510" y2="436" class="ann-line"/>
+
+  <!-- Title -->
+  <text class="annotation" font-size="11" font-weight="600" text-anchor="middle" x="410" y="580">EmailViewer &#8212; Current State (pilot-ui v0.1.3)</text>
+</svg>
