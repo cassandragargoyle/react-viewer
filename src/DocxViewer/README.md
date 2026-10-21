@@ -4,7 +4,7 @@ Read-only **Word document viewer**. Renders the bytes of a `.docx` file as pages
 text styles, lists, tables, images, headers, footers, footnotes and page breaks —
 with a toolbar for zoom and the page position, inside whatever container hosts it.
 Introduced in `portunix-vscode`
-[issue 136](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/136-docx-viewer.md).
+[issue 136](https://github.com/cassandragargoyle/portunix-vscode/blob/main/docs/issues/done/136-docx-viewer.md).
 
 The rendering is done by [docx-preview](https://github.com/VolodymyrBaydalka/docxjs);
 this component adds the toolbar, the theme, link handling and the loading and failure
