@@ -4,55 +4,61 @@
  */
 
 // Unit tests for DocxViewer with docx-preview mocked: pages, failure message,
-// link handling and the zoom controls
+// link handling, the zoom controls and the default application action
 
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-const renderAsync = vi.fn();
-vi.mock('docx-preview', () => ({ renderAsync: (...args: unknown[]) => renderAsync(...args) }));
+// parseAsync is the mock the tests drive; renderDocument returns the nodes it prepared
+const parseAsync = vi.fn();
+vi.mock('docx-preview', () => ({
+    parseAsync: (...args: unknown[]) => parseAsync(...args),
+    renderDocument: async (doc: { nodes: Node[] }) => doc.nodes,
+}));
 
 import { DocxViewer } from './DocxViewer';
 
 const DATA = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
 
-// What docx-preview produces: a wrapper with one section per page, styles separately
+// What docx-preview produces: a style element and a wrapper with one section per page
 function fakeRender(pages: number, pageHtml = '<p>Text</p>') {
-    return async (_data: unknown, body: HTMLElement, styles: HTMLElement) => {
-        styles.innerHTML = '<style>.docx { color: black; }</style>';
-        const sections = Array.from({ length: pages }, () => `<section class="docx">${pageHtml}</section>`);
-        body.innerHTML = `<div class="docx-wrapper">${sections.join('')}</div>`;
+    return async () => {
+        const style = document.createElement('style');
+        style.textContent = '.docx { color: black; }';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'docx-wrapper';
+        wrapper.innerHTML = Array.from({ length: pages }, () => `<section class="docx">${pageHtml}</section>`).join('');
+        return { parts: [], nodes: [style, wrapper] };
     };
 }
 
 describe('DocxViewer', () => {
     beforeEach(() => {
-        renderAsync.mockReset();
+        parseAsync.mockReset();
     });
 
     it('renders the pages and shows the page position', async () => {
-        renderAsync.mockImplementation(fakeRender(3));
+        parseAsync.mockImplementation(fakeRender(3));
         const { container } = render(<DocxViewer data={DATA} />);
         expect(await screen.findByText('Page 1 of 3')).toBeInTheDocument();
         expect(container.querySelectorAll('section.docx')).toHaveLength(3);
-        expect(renderAsync).toHaveBeenCalledWith(
+        expect(container.querySelector('style')).toHaveTextContent('.docx { color: black; }');
+        expect(parseAsync).toHaveBeenCalledWith(
             DATA,
-            expect.any(HTMLElement),
-            expect.any(HTMLElement),
             expect.objectContaining({ breakPages: true, renderComments: false }),
         );
     });
 
     it('shows loading until the document is rendered', () => {
-        renderAsync.mockReturnValue(new Promise(() => {}));
+        parseAsync.mockReturnValue(new Promise(() => {}));
         render(<DocxViewer data={DATA} />);
         expect(screen.getByText('Loading document…')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Zoom in' })).toBeDisabled();
     });
 
     it('shows the reason and reports it when the document cannot be rendered', async () => {
-        renderAsync.mockRejectedValue(new Error('End of central directory not found'));
+        parseAsync.mockRejectedValue(new Error('End of central directory not found'));
         const onError = vi.fn();
         render(<DocxViewer data={DATA} onError={onError} />);
         expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -62,7 +68,7 @@ describe('DocxViewer', () => {
     });
 
     it('hands an external link to the host instead of navigating', async () => {
-        renderAsync.mockImplementation(fakeRender(1, '<a href="https://example.com/">Site</a>'));
+        parseAsync.mockImplementation(fakeRender(1, '<a href="https://example.com/">Site</a>'));
         const onLinkClick = vi.fn();
         render(<DocxViewer data={DATA} onLinkClick={onLinkClick} />);
         const link = await screen.findByText('Site');
@@ -73,7 +79,7 @@ describe('DocxViewer', () => {
     });
 
     it('scrolls to a bookmark without calling the host', async () => {
-        renderAsync.mockImplementation(
+        parseAsync.mockImplementation(
             fakeRender(1, '<a href="#intro">Go</a><span id="intro">Intro</span>'),
         );
         const onLinkClick = vi.fn();
@@ -85,8 +91,34 @@ describe('DocxViewer', () => {
         expect(onLinkClick).not.toHaveBeenCalled();
     });
 
+    it('offers the default application only when the host handles it', async () => {
+        parseAsync.mockImplementation(fakeRender(1));
+        const { unmount } = render(<DocxViewer data={DATA} />);
+        await screen.findByText('Page 1 of 1');
+        expect(screen.queryByText('Open in default application')).not.toBeInTheDocument();
+        unmount();
+
+        const onOpenExternally = vi.fn();
+        render(<DocxViewer data={DATA} onOpenExternally={onOpenExternally} />);
+        await screen.findByText('Page 1 of 1');
+        fireEvent.click(screen.getByRole('button', { name: /Open in default application/ }));
+        expect(onOpenExternally).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the default application available when the document fails', async () => {
+        parseAsync.mockRejectedValue(new Error('Corrupted zip'));
+        const onOpenExternally = vi.fn();
+        render(<DocxViewer data={DATA} onOpenExternally={onOpenExternally} />);
+        await screen.findByRole('alert');
+        expect(screen.getByRole('button', { name: 'Zoom in' })).toBeDisabled();
+        const open = screen.getByRole('button', { name: /Open in default application/ });
+        expect(open).toBeEnabled();
+        fireEvent.click(open);
+        expect(onOpenExternally).toHaveBeenCalledTimes(1);
+    });
+
     it('steps the zoom and returns to actual size', async () => {
-        renderAsync.mockImplementation(fakeRender(1));
+        parseAsync.mockImplementation(fakeRender(1));
         render(<DocxViewer data={DATA} initialZoom={1} />);
         await screen.findByText('Page 1 of 1');
         expect(screen.getByText('100%')).toBeInTheDocument();

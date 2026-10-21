@@ -7,7 +7,7 @@
 // Stateless: the viewer owns the zoom and the page numbers and passes them in
 
 import React from 'react';
-import { ActualSizeIcon, FitWidthIcon, ZoomInIcon, ZoomOutIcon } from './icons';
+import { ActualSizeIcon, FitWidthIcon, OpenExternalIcon, ZoomInIcon, ZoomOutIcon } from './icons';
 import { MAX_ZOOM, MIN_ZOOM, formatZoom, type DocxZoom } from './layout';
 
 export interface DocxToolbarProps {
@@ -21,6 +21,9 @@ export interface DocxToolbarProps {
     onZoomIn: () => void;
     onZoomOut: () => void;
     onZoom: (zoom: DocxZoom) => void;
+    // Shows the "open in default application" action; enabled even when the document
+    // failed to render, since another application may still open it
+    onOpenExternally?: () => void;
 }
 
 export function DocxToolbar({
@@ -32,6 +35,7 @@ export function DocxToolbar({
     onZoomIn,
     onZoomOut,
     onZoom,
+    onOpenExternally,
 }: DocxToolbarProps): JSX.Element {
     return (
         <div className="docx-toolbar" role="toolbar" aria-label="Document view">
@@ -81,11 +85,24 @@ export function DocxToolbar({
             >
                 <ActualSizeIcon />
             </button>
-            {pageCount > 0 && (
-                <span className="docx-toolbar-pages">
-                    Page {page} of {pageCount}
-                </span>
-            )}
+            <span className="docx-toolbar-end">
+                {pageCount > 0 && (
+                    <span className="docx-toolbar-pages">
+                        Page {page} of {pageCount}
+                    </span>
+                )}
+                {onOpenExternally && (
+                    <button
+                        className="docx-toolbar-btn docx-toolbar-btn-text"
+                        type="button"
+                        title="Open in the default application of the operating system"
+                        onClick={onOpenExternally}
+                    >
+                        <OpenExternalIcon />
+                        <span>Open in default application</span>
+                    </button>
+                )}
+            </span>
         </div>
     );
 }

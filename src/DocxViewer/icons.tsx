@@ -53,6 +53,17 @@ export function FitWidthIcon(): JSX.Element {
     );
 }
 
+// Open in another application: a box with an arrow leaving it
+export function OpenExternalIcon(): JSX.Element {
+    return (
+        <svg {...base} aria-hidden="true">
+            <path d="M12 9v4H3V4h4" />
+            <path d="M9.5 2H14v4.5" />
+            <path d="M14 2 7.5 8.5" />
+        </svg>
+    );
+}
+
 // Actual size: a page outline
 export function ActualSizeIcon(): JSX.Element {
     return (

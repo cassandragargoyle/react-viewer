@@ -7,8 +7,10 @@
 // Layout: toolbar (zoom, page position) above a scrolling pane — fills its host container
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { renderAsync } from 'docx-preview';
+import { parseAsync, renderDocument } from 'docx-preview';
 import { DocxToolbar } from './DocxToolbar';
+import { markPageFields } from './fields';
+import { paginate } from './paginate';
 import { currentPage, resolveScale, zoomIn, zoomOut, type DocxZoom } from './layout';
 import docxViewerStyles from './DocxViewer.css';
 
@@ -38,12 +40,16 @@ export interface DocxViewerProps {
     onLinkClick?: (href: string) => void;
     // The document could not be rendered; the pane shows the reason on its own
     onError?: (error: Error) => void;
+    // When given, the toolbar offers "Open in default application"; the host opens the
+    // file in whatever application the operating system uses for .docx
+    onOpenExternally?: () => void;
 }
 
 type Status = { kind: 'loading' } | { kind: 'ready' } | { kind: 'error'; message: string };
 
 // docx-preview options: pages as the document defines them, including the page breaks
-// Word recorded when it last laid the document out, so pages match the original
+// Word recorded when it last laid the document out, so pages match the original. A
+// document without recorded breaks is split into pages afterwards (paginate.ts)
 const RENDER_OPTIONS = {
     className: 'docx',
     inWrapper: true,
@@ -69,17 +75,44 @@ function toError(value: unknown): Error {
 
 // Width of the widest page at 100 %, plus its gutter; 0 when nothing is rendered
 function measureNaturalWidth(host: HTMLElement): number {
-    const previous = host.style.zoom;
-    host.style.zoom = '1';
     let widest = 0;
     host.querySelectorAll<HTMLElement>('section.docx').forEach((page) => {
         widest = Math.max(widest, page.offsetWidth);
     });
-    host.style.zoom = previous;
     return widest > 0 ? widest + 2 * PAGE_GUTTER_PX : 0;
 }
 
-export function DocxViewer({ data, initialZoom = 'auto', onLinkClick, onError }: DocxViewerProps): JSX.Element {
+// docx-preview's renderAsync, split open so the PAGE / NUMPAGES fields can be marked
+// between parsing and rendering. Style nodes go to `styles`, the pages to `body`
+async function renderDocx(data: ArrayBuffer | Uint8Array, body: HTMLElement, styles: HTMLElement): Promise<void> {
+    const document = await parseAsync(data, RENDER_OPTIONS);
+    markPageFields(document);
+    const nodes = await renderDocument(document, RENDER_OPTIONS);
+    for (const node of nodes) {
+        (node.nodeName === 'STYLE' ? styles : body).appendChild(node);
+    }
+}
+
+// Lay the pages out and measure them, at 100 % whatever the current zoom: the page
+// heights docx-preview sets are in document units, compared with unzoomed layout.
+// Returns the page count and the natural width of the document
+function layoutPages(host: HTMLElement): { pages: number; width: number } {
+    const previous = host.style.zoom;
+    host.style.zoom = '1';
+    try {
+        return { pages: paginate(host), width: measureNaturalWidth(host) };
+    } finally {
+        host.style.zoom = previous;
+    }
+}
+
+export function DocxViewer({
+    data,
+    initialZoom = 'auto',
+    onLinkClick,
+    onError,
+    onOpenExternally,
+}: DocxViewerProps): JSX.Element {
     const paneRef = useRef<HTMLDivElement>(null);
     // Filled imperatively by docx-preview; React only sets its zoom
     const contentRef = useRef<HTMLDivElement>(null);
@@ -97,20 +130,22 @@ export function DocxViewer({ data, initialZoom = 'auto', onLinkClick, onError }:
     onLinkClickRef.current = onLinkClick;
 
     // Render into detached elements and swap them in when done, so a slow render of a
-    // previous value can never mix with the current one
+    // previous value can never mix with the current one. Pagination needs layout, so it
+    // runs right after the swap, before the browser paints the unsplit pages
     useEffect(() => {
         let cancelled = false;
         setStatus({ kind: 'loading' });
         const body = document.createElement('div');
         const styles = document.createElement('div');
-        renderAsync(data, body, styles, RENDER_OPTIONS)
+        renderDocx(data, body, styles)
             .then(() => {
                 const host = contentRef.current;
                 if (cancelled || !host) return;
                 host.replaceChildren(styles, body);
-                setPageCount(host.querySelectorAll('section.docx').length);
+                const { pages, width } = layoutPages(host);
+                setPageCount(pages);
                 setPage(1);
-                setNaturalWidth(measureNaturalWidth(host));
+                setNaturalWidth(width);
                 setStatus({ kind: 'ready' });
             })
             .catch((reason: unknown) => {
@@ -184,6 +219,7 @@ export function DocxViewer({ data, initialZoom = 'auto', onLinkClick, onError }:
                 onZoomIn={() => setZoom(zoomIn(scale))}
                 onZoomOut={() => setZoom(zoomOut(scale))}
                 onZoom={setZoom}
+                onOpenExternally={onOpenExternally}
             />
             <div className="docx-viewer-pane" ref={paneRef} onScroll={updatePage}>
                 {status.kind === 'loading' && pageCount === 0 && (

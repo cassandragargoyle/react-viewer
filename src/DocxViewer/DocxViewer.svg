@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 600" width="820" height="600">
+  <defs>
+    <style>
+      .bg { fill: #1e1e1e; }
+      .panel-bg { fill: #1e1e1e; }
+      .panel-border { stroke: #444444; fill: none; stroke-width: 1; }
+      .sep { stroke: #444444; stroke-width: 1; }
+      .text { fill: #cccccc; font-family: 'Segoe UI', sans-serif; }
+      .text-dim { fill: #858585; font-family: 'Segoe UI', sans-serif; }
+      .btn-pressed { fill: rgba(255, 255, 255, 0.12); }
+      .page { fill: #ffffff; }
+      .page-shadow { fill: rgba(0, 0, 0, 0.4); }
+      .doc-h { fill: #111111; font-family: 'Calibri', 'Segoe UI', sans-serif; font-weight: 600; }
+      .doc-t { fill: #333333; font-family: 'Calibri', 'Segoe UI', sans-serif; }
+      .doc-dim { fill: #888888; font-family: 'Calibri', 'Segoe UI', sans-serif; }
+      .doc-line { fill: #d6d6d6; }
+      .doc-rule { stroke: #bbbbbb; stroke-width: 1; }
+      .doc-cell { fill: none; stroke: #999999; stroke-width: 1; }
+      .doc-head-cell { fill: #dfe6f0; stroke: #999999; stroke-width: 1; }
+      .icon { stroke: #cccccc; fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+      .annotation { fill: #75beff; font-family: 'Segoe UI', sans-serif; }
+      .ann-line { stroke: #75beff; stroke-width: 1; stroke-dasharray: 3,3; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="820" height="600"/>
+
+  <!-- ================= DOCXVIEWER PANEL ================= -->
+  <g transform="translate(30, 36)">
+    <rect x="3" y="3" width="460" height="520" rx="6" fill="rgba(0,0,0,0.35)"/>
+    <rect class="panel-bg" x="0" y="0" width="460" height="520" rx="6"/>
+    <rect class="panel-border" x="0" y="0" width="460" height="520" rx="6"/>
+
+    <!-- Toolbar (.docx-toolbar): zoom out / level / zoom in | page width, actual size -->
+    <g transform="translate(16, 12)">
+      <circle class="icon" cx="7" cy="7" r="4.5"/>
+      <path class="icon" d="M10.5 10.5 14 14"/>
+      <path class="icon" d="M5 7h4"/>
+    </g>
+    <text class="text" font-size="12" x="58" y="25" text-anchor="middle">100%</text>
+    <g transform="translate(84, 12)">
+      <circle class="icon" cx="7" cy="7" r="4.5"/>
+      <path class="icon" d="M10.5 10.5 14 14"/>
+      <path class="icon" d="M5 7h4"/>
+      <path class="icon" d="M7 5v4"/>
+    </g>
+    <line x1="112" y1="12" x2="112" y2="28" class="sep"/>
+    <g transform="translate(124, 12)">
+      <path class="icon" d="M2 3v10"/>
+      <path class="icon" d="M14 3v10"/>
+      <path class="icon" d="M4.5 8h7"/>
+      <path class="icon" d="M6.5 6 4.5 8l2 2"/>
+      <path class="icon" d="M9.5 6l2 2-2 2"/>
+    </g>
+    <g transform="translate(152, 12)">
+      <path class="icon" d="M4 2h5.5L12 4.5V14H4z"/>
+      <path class="icon" d="M9.5 2v2.5H12"/>
+    </g>
+
+    <!-- Toolbar end (.docx-toolbar-end): page position, open in default application -->
+    <text class="text-dim" font-size="11" x="190" y="25">Page 1 of 3</text>
+    <rect class="btn-pressed" x="256" y="8" width="196" height="24" rx="4"/>
+    <g transform="translate(264, 12)">
+      <path class="icon" d="M12 9v4H3V4h4"/>
+      <path class="icon" d="M9.5 2H14v4.5"/>
+      <path class="icon" d="M14 2 7.5 8.5"/>
+    </g>
+    <text class="text" font-size="11" font-weight="500" x="286" y="24">Open in default application</text>
+
+    <line x1="0" y1="40" x2="460" y2="40" class="sep"/>
+
+    <!-- Pane (.docx-viewer-pane): theme background, white pages from docx-preview -->
+    <rect class="page-shadow" x="81" y="57" width="300" height="420" rx="1"/>
+    <rect class="page" x="80" y="56" width="300" height="420"/>
+
+    <!-- Page header -->
+    <text class="doc-dim" font-size="8" x="104" y="76">Quarterly report · Infinite Projects</text>
+    <line x1="104" y1="82" x2="356" y2="82" class="doc-rule"/>
+
+    <!-- Heading and paragraphs -->
+    <text class="doc-h" font-size="15" x="104" y="108">Q3 project summary</text>
+    <rect class="doc-line" x="104" y="120" width="252" height="5"/>
+    <rect class="doc-line" x="104" y="130" width="240" height="5"/>
+    <rect class="doc-line" x="104" y="140" width="248" height="5"/>
+    <rect class="doc-line" x="104" y="150" width="160" height="5"/>
+
+    <text class="doc-h" font-size="11" x="104" y="176">1. Milestones</text>
+    <circle cx="110" cy="190" r="1.8" fill="#333333"/>
+    <rect class="doc-line" x="118" y="188" width="200" height="5"/>
+    <circle cx="110" cy="202" r="1.8" fill="#333333"/>
+    <rect class="doc-line" x="118" y="200" width="170" height="5"/>
+    <circle cx="110" cy="214" r="1.8" fill="#333333"/>
+    <rect class="doc-line" x="118" y="212" width="186" height="5"/>
+
+    <!-- Table -->
+    <text class="doc-h" font-size="11" x="104" y="240">2. Budget</text>
+    <rect class="doc-head-cell" x="104" y="248" width="126" height="16"/>
+    <rect class="doc-head-cell" x="230" y="248" width="126" height="16"/>
+    <text class="doc-t" font-size="8" font-weight="600" x="110" y="259">Item</text>
+    <text class="doc-t" font-size="8" font-weight="600" x="236" y="259">Amount</text>
+    <rect class="doc-cell" x="104" y="264" width="126" height="16"/>
+    <rect class="doc-cell" x="230" y="264" width="126" height="16"/>
+    <rect class="doc-cell" x="104" y="280" width="126" height="16"/>
+    <rect class="doc-cell" x="230" y="280" width="126" height="16"/>
+    <text class="doc-t" font-size="8" x="110" y="275">Development</text>
+    <text class="doc-t" font-size="8" x="236" y="275">42 000</text>
+    <text class="doc-t" font-size="8" x="110" y="291">Testing</text>
+    <text class="doc-t" font-size="8" x="236" y="291">12 500</text>
+
+    <!-- Embedded image -->
+    <rect x="104" y="312" width="110" height="72" rx="2" fill="#3478f6"/>
+    <path d="M110 376l26-28 18 16 14-12 40 24z" fill="#9cc2ff"/>
+    <rect class="doc-line" x="224" y="316" width="132" height="5"/>
+    <rect class="doc-line" x="224" y="326" width="120" height="5"/>
+    <rect class="doc-line" x="224" y="336" width="128" height="5"/>
+    <rect class="doc-line" x="224" y="346" width="92" height="5"/>
+
+    <rect class="doc-line" x="104" y="400" width="252" height="5"/>
+    <rect class="doc-line" x="104" y="410" width="232" height="5"/>
+
+    <!-- Page footer -->
+    <line x1="104" y1="448" x2="356" y2="448" class="doc-rule"/>
+    <text class="doc-dim" font-size="8" x="230" y="462" text-anchor="middle">1</text>
+
+    <!-- Next page, partly scrolled into view -->
+    <rect class="page-shadow" x="81" y="493" width="300" height="27"/>
+    <rect class="page" x="80" y="492" width="300" height="27"/>
+    <text class="doc-dim" font-size="8" x="104" y="512">Quarterly report · Infinite Projects</text>
+  </g>
+
+  <!-- ================= ANNOTATIONS ================= -->
+
+  <!-- Zoom -->
+  <text class="annotation" font-size="10" x="512" y="52">.docx-toolbar — zoom</text>
+  <text class="annotation" font-size="9"  x="512" y="64">zoom out / zoom in 25–400 %, page width, actual size;</text>
+  <text class="annotation" font-size="9"  x="512" y="76">default auto: fits the pane, never above 100 %</text>
+  <line x1="494" y1="58" x2="510" y2="58" class="ann-line"/>
+
+  <!-- Page position and open externally -->
+  <text class="annotation" font-size="10" x="512" y="104">.docx-toolbar-end</text>
+  <text class="annotation" font-size="9"  x="512" y="116">Page N of M at the pane top; Open in default application</text>
+  <text class="annotation" font-size="9"  x="512" y="128">when the host passes onOpenExternally (OS decides the app)</text>
+  <line x1="494" y1="110" x2="510" y2="110" class="ann-line"/>
+
+  <!-- Pages -->
+  <text class="annotation" font-size="10" x="512" y="196">section.docx (docx-preview)</text>
+  <text class="annotation" font-size="9"  x="512" y="208">one white page per document page, with header,</text>
+  <text class="annotation" font-size="9"  x="512" y="220">footer and page breaks; area around follows the theme</text>
+  <line x1="494" y1="202" x2="510" y2="202" class="ann-line"/>
+
+  <!-- Content -->
+  <text class="annotation" font-size="10" x="512" y="300">styles, lists, tables, images</text>
+  <text class="annotation" font-size="9"  x="512" y="312">embedded images and fonts become blob: URLs;</text>
+  <text class="annotation" font-size="9"  x="512" y="324">nothing remote is loaded</text>
+  <line x1="494" y1="306" x2="510" y2="306" class="ann-line"/>
+
+  <!-- Links -->
+  <text class="annotation" font-size="10" x="512" y="404">links</text>
+  <text class="annotation" font-size="9"  x="512" y="416">#bookmark scrolls inside the document; any other link</text>
+  <text class="annotation" font-size="9"  x="512" y="428">goes to onLinkClick — the viewer never navigates</text>
+  <line x1="494" y1="410" x2="510" y2="410" class="ann-line"/>
+
+  <!-- Title -->
+  <text class="annotation" font-size="11" font-weight="600" text-anchor="middle" x="410" y="580">DocxViewer &#8212; Current State (react-viewer v0.2.0)</text>
+</svg>
