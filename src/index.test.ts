@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 
 import * as api from './index';
 
-const EXPECTED = ['EmailViewer', 'formatEmailDate'] as const;
+const EXPECTED = ['DocxViewer', 'EmailViewer', 'formatEmailDate'] as const;
 
 describe('package entry point', () => {
     it.each(EXPECTED)('exports %s', (name) => {

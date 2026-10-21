@@ -11,7 +11,7 @@ React viewers for document formats, shared across the CassandraGargoyle ecosyste
 **Language**: TypeScript (React 19, Node 24+)
 **Package**: [`@cassandragargoyle/react-viewer`](https://www.npmjs.com/package/@cassandragargoyle/react-viewer) on npmjs.com
 
-A viewer shows one kind of document — an e-mail message today — from data the host has
+A viewer shows one kind of document — an e-mail message or a Word document — from data the host has
 already read. It never parses a file format and never calls a host API: the host reads the
 file, maps it to the viewer's own type, and passes it in as props. General UI building
 blocks live next door in [`react-components`](https://github.com/cassandragargoyle/react-components).
@@ -26,7 +26,8 @@ and [ADR-012](https://github.com/cassandragargoyle/portunix-vscode/blob/main/doc
 npm install @cassandragargoyle/react-viewer dompurify
 ```
 
-React 19 and `dompurify` are peer dependencies.
+React 19 and `dompurify` are peer dependencies. `DocxViewer` also needs the optional peer
+`docx-preview` (`npm install docx-preview`).
 
 ```tsx
 import { EmailViewer, type EmailMessage } from '@cassandragargoyle/react-viewer';
@@ -44,6 +45,7 @@ to import. Colours follow the Visual Studio Code theme variables when they are p
 | Viewer | What it shows |
 | ------ | ------------- |
 | [`EmailViewer`](https://github.com/cassandragargoyle/react-viewer/tree/main/src/EmailViewer) | An e-mail message: header, attachments and a sandboxed HTML / text / source / headers body |
+| [`DocxViewer`](https://github.com/cassandragargoyle/react-viewer/tree/main/src/DocxViewer) | A Word `.docx` document as pages, with zoom and the page position; needs the optional peer `docx-preview` |
 
 ## Development
 
